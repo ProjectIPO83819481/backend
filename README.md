@@ -30,7 +30,24 @@
 
 #### 1.5.3. Дополнительные технологии
 - **API документация:** Swagger/OpenAPI (встроенная в FastAPI)
-
+#### 1.5.4. Структура проекта
+```
+backend/
+├── app/
+│   ├── api/
+│   │   ├── v1/                   # endpoints
+│   │   │   └── router.py
+│   │   └── deps.py            # Зависимости (get_db, get_current_user)
+│   ├── core/
+│   │   ├── config.py          # Настройки приложения
+│   │   ├── security.py        # JWT, хеширование
+│   │   └── database.py        # Подключение к БД
+│   ├── models/                # SQLAlchemy модели
+│   ├── schemas/               # Pydantic схемы
+│   ├── services/              # логика
+│   └── main.py                # Точка входа FastAPI
+├── tests/                         #Тестироваение
+└── requirements.txt```
 ---
 
 ## 2. ФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ
