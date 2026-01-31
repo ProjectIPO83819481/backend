@@ -47,7 +47,8 @@ backend/
 │   ├── services/              # логика
 │   └── main.py                # Точка входа FastAPI
 ├── tests/                         #Тестироваение
-└── requirements.txt```
+└── requirements.txt
+```
 ---
 
 ## 2. ФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ
