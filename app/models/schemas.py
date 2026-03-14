@@ -93,8 +93,8 @@ class CatalogFilterRequest(BaseModel):
     search: Optional[str] = None
     min_price: Optional[float] = Field(None, ge=0)
     max_price: Optional[float] = Field(None, ge=0)
-    sort_by: Optional[str] = Field("popularity", regex="^(price|rating|popularity|newest)$")
-    sort_order: Optional[str] = Field("desc", regex="^(asc|desc)$")
+    sort_by: Optional[str] = Field("popularity", pattern="^(price|rating|popularity|newest)$")
+    sort_order: Optional[str] = Field("desc", pattern="^(asc|desc)$")
     skip: int = Field(0, ge=0)
     limit: int = Field(20, ge=1, le=100)
 
