@@ -7,7 +7,6 @@ from models.schemas import (
     CatalogListResponse,
     CategoryResponse,
     CategoryListResponse,
-    ServiceCategoryEnum,
 )
 from models.service import ServiceCategory
 from services.service_functions import (
@@ -20,8 +19,7 @@ from services.service_functions import (
     get_trending_services,
 )
 from utils.subcategories import SUBCATEGORIES
-from core.database import database
-
+from ..deps import get_db
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 
