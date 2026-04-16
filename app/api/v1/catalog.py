@@ -7,7 +7,6 @@ from models.schemas import (
     CatalogListResponse,
     CategoryResponse,
     CategoryListResponse,
-    ServiceCategoryEnum,
 )
 from models.service import ServiceCategory
 from services.service_functions import (
@@ -20,8 +19,7 @@ from services.service_functions import (
     get_trending_services,
 )
 from utils.subcategories import SUBCATEGORIES
-from core.database import database
-
+from ..deps import get_db
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 
@@ -40,8 +38,8 @@ async def list_services(
     search: Optional[str] = Query(None, description="Search by name, description, or materials"),
     min_price: Optional[float] = Query(None, ge=0, description="Minimum price"),
     max_price: Optional[float] = Query(None, ge=0, description="Maximum price"),
-    sort_by: str = Query("popularity", regex="^(price|rating|popularity|newest)$"),
-    sort_order: str = Query("desc", regex="^(asc|desc)$"),
+    sort_by: str = Query("popularity", pattern="^(price|rating|popularity|newest)$"),
+    sort_order: str = Query("desc", pattern="^(asc|desc)$"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),

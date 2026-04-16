@@ -1,6 +1,7 @@
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.12.1
+asyncpg==0.31.0
 automium==0.2.6
 automium_web==0.1.1
 blinker==1.9.0

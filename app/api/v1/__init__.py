@@ -1,1 +1,1 @@
-from .router import router
+from .catalog import router as catalog_router
