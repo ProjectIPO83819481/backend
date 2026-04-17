@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 from datetime import datetime
 from app.api.deps import get_db
-from app.models.models import Order, Status
+from app.models.models import Order, Status, User
 from app.models.service import Service
 from sqlalchemy import select
 
@@ -68,7 +68,7 @@ async def create_order(order_data: CreateOrderRequest, db: AsyncSession = Depend
     }
 
 @router.get("/orders/{order_id}", response_model=dict)
-async def create_order(order_id: int, db: AsyncSession = Depends(get_db)):
+async def order(order_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Order).where(Order.order_id == order_id))
     order = result.scalar_one_or_none()
     if not order:
@@ -80,3 +80,18 @@ async def create_order(order_id: int, db: AsyncSession = Depends(get_db)):
           description=order.description,
           status=order.status,
           final_cost=order.final_cost)
+@router.get("/user/{user_id}", response_model=dict)
+async def user(user_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.user_id == user_id))
+    users = result.scalar_one_or_none()
+    if not users:
+        raise HTTPException(404)
+    return dict(user_id=users.user_id,
+                email=users.email,
+                role=users.role,
+                full_name=users.full_name,
+                photo_url=users.photo_url,
+                is_suspended=users.is_suspended,
+                created_at=users.created_at,
+                updated_at=users.updated_at,
+                suspended_until=users.suspended_until)
