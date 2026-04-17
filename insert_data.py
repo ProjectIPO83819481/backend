@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core.config import DATABASE_URL
 
-engine = create_engine(DATABASE_URL.replace("+asyncpg", ""), pool_size=1000, max_overflow=-1, connect_args={"timeout": 60})
+engine = create_engine(DATABASE_URL.replace("+asyncpg", ""), pool_size=1000, max_overflow=-1)
 session_maker = sessionmaker(engine, expire_on_commit=False)
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
