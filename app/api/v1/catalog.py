@@ -1,6 +1,8 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
+
 from app.api.deps import get_db
 from app.models.schemas import (
     ServiceCatalogResponse,
@@ -20,9 +22,8 @@ from app.services.service_functions import (
     get_trending_services,
 )
 from app.utils.subcategories import SUBCATEGORIES
-from app.api.deps import get_db
-router = APIRouter(prefix="/catalog", tags=["catalog"])
 
+router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 
 def get_service_category_enum(category_str: str) -> ServiceCategory:

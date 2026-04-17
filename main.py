@@ -21,11 +21,11 @@ async def lifespan(_: FastAPI):
 app = FastAPI(
     title='Customer Service API',
     version='1.0b',
-    redoc_url='/',
+    redoc_url='/redoc',
     docs_url='/docs',
     lifespan=lifespan
 )
-app.include_router(router, prefix="/v1")
+app.include_router(router)
 
 from fastapi.staticfiles import StaticFiles
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
