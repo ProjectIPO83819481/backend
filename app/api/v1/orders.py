@@ -66,3 +66,17 @@ async def create_order(order_data: CreateOrderRequest, db: AsyncSession = Depend
         "base_cost": float(new_order.base_cost),
         "final_cost": float(new_order.final_cost)
     }
+
+@router.get("/orders/{order_id}", response_model=dict)
+async def create_order(order_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Order).where(Order.order_id == order_id))
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(404)
+    return dict(client_id=order.client_id,
+          service_id=order.service_id,
+          address=order.address,
+          scheduled_at=order.scheduled_at,
+          description=order.description,
+          status=order.status,
+          final_cost=order.final_cost)
