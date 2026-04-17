@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field
 from datetime import datetime
 from app.api.deps import get_db
 from app.models.models import Order, Status, User
-from app.models.service import Service
+from app.models.service import Service, Photo
 from sqlalchemy import select
 
 from app.services.orders.cost_calculator import calculate_order_cost
@@ -95,3 +96,12 @@ async def user(user_id: int, db: AsyncSession = Depends(get_db)):
                 created_at=users.created_at,
                 updated_at=users.updated_at,
                 suspended_until=users.suspended_until)
+
+
+@router.get("/photos/{photo_id}", response_model=RedirectResponse)
+async def photo(photo_id: int, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Photo).where(Photo.photo_id == photo_id))
+    photo_ = result.scalar_one_or_none()
+    if not photo_:
+        raise HTTPException(404)
+    return RedirectResponse(url=photo_.image_url)
