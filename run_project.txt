@@ -7,13 +7,19 @@ DB_USER="user_user"
 DB_PASS="password123"
 DB_NAME="customerservice"
 DATABASE_URL=${DB_URL}" > app/.env
-
 echo "DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASS}@localhost:5432/${DB_NAME}" > app/.env
 
-sudo -u postgres psql -t -A -c "SELECT 1 FROM pg_roles WHERE rolname='${DB_USER}'" | grep -q 1 || sudo -u postgres psql -c "CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASS}'
+
+sudo -u postgres psql -t -A -c "SELECT 1 FROM pg_roles WHERE rolname='${DB_USER}'" | grep -q 1 || sudo -u postgres psql -c "CREATE ROLE ${DB_USER} LOGIN PASSWORD '${DB_PASS}';"
+
+
 sudo -u postgres psql -t -A -c "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" | grep -q 1 || sudo -u postgres psql -c "CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};"
+
+
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO ${DB_USER};" 2>/dev/null || true
+
 sudo -u postgres psql -d ${DB_NAME} -c "GRANT ALL ON SCHEMA public TO ${DB_USER};" 2>/dev/null || true
+
 
 
 
@@ -27,9 +33,11 @@ VALUES
     ('client@test.com', 'hashed_placeholder', 'CLIENT', 'Petr Client', '+79990001122', false)
 ON CONFLICT (email) DO NOTHING;
 
+DO $$
 DECLARE exec_id INTEGER;
 BEGIN
     SELECT user_id INTO exec_id FROM users WHERE email = 'executor@test.com';
+    
     IF exec_id IS NOT NULL THEN
         INSERT INTO services (user_id, name, category_name, subcategory, description, base_price, avg_duration_minutes, is_active)
         VALUES 
@@ -37,6 +45,9 @@ BEGIN
             (exec_id, 'Faucet Replacement', 'PLUMBING', 'repair', 'Replace old faucet', 800.00, 60, true),
             (exec_id, 'Socket Installation', 'ELECTRICAL', 'installation', 'Install new socket', 500.00, 30, true)
         ON CONFLICT DO NOTHING;
+    END IF;
+END $$;
+SQL
 
 CLIENT_ID=$(sudo -u postgres psql -t -A -c "SELECT user_id FROM users WHERE email='client@test.com' LIMIT 1;")
 
