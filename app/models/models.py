@@ -1,10 +1,11 @@
 import enum
-from datetime import datetime, UTC
+from sqlalchemy import func
+from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, Numeric, Enum as SQLEnum, ForeignKey, CheckConstraint
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from app.models.base import Base
 
 class Role(enum.Enum):
     CLIENT = "Client"
@@ -35,8 +36,8 @@ class User(Base):
     photo_url = Column(String(255), nullable=True)
     is_suspended = Column(Boolean, default=False, nullable=False)
     suspended_until = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.now(UTC))
-    updated_at = Column(DateTime, default=datetime.now(UTC), onupdate=datetime.now(UTC))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     services = relationship("Service", back_populates="user", foreign_keys="Service.user_id", cascade="all, delete-orphan")
     orders_as_client = relationship("Order", foreign_keys="Order.client_id", back_populates="client", cascade="all, delete-orphan")
     orders_as_executor = relationship("Order", foreign_keys="Order.executor_id", back_populates="executor")
@@ -56,8 +57,8 @@ class Order(Base):
     address = Column(String(255), nullable=True)
     scheduled_at = Column(DateTime, nullable=True)
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.now(UTC))
-    updated_at = Column(DateTime, default=datetime.now(UTC), onupdate=datetime.now(UTC))
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     started_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
@@ -72,10 +73,7 @@ class Order(Base):
     service = relationship("Service", back_populates="orders")
     cancelled_by_user = relationship("User", foreign_keys=[cancelled_by_user_id], back_populates="cancelled_orders")
     additional_work_requests = relationship("AdditionalWork", back_populates="order", cascade="all, delete-orphan")
-    __table_args__ = (
-        CheckConstraint("base_cost > 0", name="check_base_cost_positive"),
-        CheckConstraint("final_cost > 0", name="check_final_cost_positive")
-    )
+
 
 
 class AdditionalWork(Base):
@@ -88,11 +86,7 @@ class AdditionalWork(Base):
     additional_cost = Column(Numeric(precision=10, scale=2), nullable=False)
     additional_time_minutes = Column(Integer, nullable=True)
     status = Column(SQLEnum(AdditionalWorkRequestStatuses), nullable=False, index=True, default=AdditionalWorkRequestStatuses.PENDING)
-    created_at = Column(DateTime, default=datetime.now(UTC))
+    created_at = Column(DateTime, server_default=func.now())
     responded_at = Column(DateTime, nullable=True)
     order = relationship("Order", back_populates="additional_work_requests")
     responder = relationship("User", back_populates="additional_work_responses")
-    
-    __table_args__ = (
-        CheckConstraint("additional_cost > 0", name="check_additional_cost_positive"),
-    )

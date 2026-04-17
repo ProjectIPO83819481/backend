@@ -1,10 +1,10 @@
 import enum
-from datetime import datetime
-
+from datetime import datetime, UTC
+from sqlalchemy import func
 from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, Enum as SQLEnum, ForeignKey, Numeric, Float
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from app.models.base import Base
 
 
 class ServiceCategory(enum.Enum):
@@ -29,10 +29,12 @@ class Service(Base):
     rating = Column(Float, default=0.0, nullable=False)
     total_reviews = Column(Integer, default=0, nullable=False)
     popularity_score = Column(Float, default=0.0, nullable=False)
+    user = relationship("User", back_populates="services", foreign_keys=[user_id])
+    orders = relationship("Order", back_populates="service", cascade="all, delete-orphan")
     photos = relationship("Photo", back_populates="service", cascade="all, delete-orphan")
     is_active = Column(Boolean, default=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
 
 class Photo(Base):
@@ -43,4 +45,4 @@ class Photo(Base):
     image_url = Column(String(500), nullable=False)
     description = Column(Text, nullable=True)
     service = relationship("Service", back_populates="photos")
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, server_default=func.now())

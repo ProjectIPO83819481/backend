@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, desc, asc, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional, Tuple
-from models.service import Service, ServiceCategory, Photo
-from utils.subcategories import SUBCATEGORIES
+from app.models.service import Service, ServiceCategory, Photo
+from app.utils.subcategories import SUBCATEGORIES
 from sqlalchemy import select, delete, update
 
 

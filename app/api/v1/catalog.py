@@ -1,15 +1,16 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
-from models.schemas import (
+from app.api.deps import get_db
+from app.models.schemas import (
     ServiceCatalogResponse,
     ServiceDetailResponse,
     CatalogListResponse,
     CategoryResponse,
     CategoryListResponse,
 )
-from models.service import ServiceCategory
-from services.service_functions import (
+from app.models.service import ServiceCategory
+from app.services.service_functions import (
     get_catalog_services,
     search_services,
     get_service_by_id,
@@ -18,8 +19,8 @@ from services.service_functions import (
     get_top_rated_services,
     get_trending_services,
 )
-from utils.subcategories import SUBCATEGORIES
-from ..deps import get_db
+from app.utils.subcategories import SUBCATEGORIES
+from app.api.deps import get_db
 router = APIRouter(prefix="/catalog", tags=["catalog"])
 
 
@@ -68,7 +69,7 @@ async def list_services(
         total=total,
         skip=skip,
         limit=limit,
-        items=[ServiceCatalogResponse.from_attributes(s) for s in services],
+        items=[ServiceCatalogResponse.model_validate(s) for s in services],
     )
 
 
@@ -79,7 +80,7 @@ async def search_catalog(
     db: AsyncSession = Depends(get_db),
 ):
     services = await search_services(db, q, limit=limit)
-    return [ServiceCatalogResponse.from_attributes(s) for s in services]
+    return [ServiceCatalogResponse.model_validate(s) for s in services]
 
 
 @router.get("/services/{service_id}", response_model=ServiceDetailResponse)
@@ -94,7 +95,7 @@ async def get_service_details(
             detail="Service not found",
         )
     
-    return ServiceDetailResponse.from_attributes(service)
+    return ServiceDetailResponse.model_validate(service)
 
 
 @router.get("/services/{service_id}/similar", response_model=List[ServiceCatalogResponse])
@@ -111,7 +112,7 @@ async def get_similar(
         )
     
     similar = await get_similar_services(db, service_id, limit=limit)
-    return [ServiceCatalogResponse.from_attributes(s) for s in similar]
+    return [ServiceCatalogResponse.model_validate(s) for s in similar]
 
 
 @router.get("/categories", response_model=CategoryListResponse)
@@ -163,7 +164,7 @@ async def get_category_services(
         raise HTTPException(status_code=404, detail=f"Category '{category}' not found")
     
     services = await get_services_by_category(db, category_enum, limit=limit)
-    return [ServiceCatalogResponse.from_attributes(s) for s in services]
+    return [ServiceCatalogResponse.model_validate(s) for s in services]
 
 
 @router.get("/top-rated", response_model=List[ServiceCatalogResponse])
@@ -173,7 +174,7 @@ async def get_top_rated(
     db: AsyncSession = Depends(get_db),
 ):
     services = await get_top_rated_services(db, limit=limit, min_reviews=min_reviews)
-    return [ServiceCatalogResponse.from_attributes(s) for s in services]
+    return [ServiceCatalogResponse.model_validate(s) for s in services]
 
 
 @router.get("/trending", response_model=List[ServiceCatalogResponse])
@@ -182,4 +183,4 @@ async def get_trending(
     db: AsyncSession = Depends(get_db),
 ):
     services = await get_trending_services(db, limit=limit)
-    return [ServiceCatalogResponse.from_attributes(s) for s in services]
+    return [ServiceCatalogResponse.model_validate(s) for s in services]
