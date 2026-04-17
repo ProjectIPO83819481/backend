@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, computed_field
 from datetime import datetime
 from enum import Enum
 
@@ -74,7 +74,6 @@ class ServiceCatalogResponse(BaseModel):
     rating: float = Field(ge=0, le=5)
     total_reviews: int
     popularity_score: float
-    photos: List[PhotoResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
